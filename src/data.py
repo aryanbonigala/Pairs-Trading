@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "raw"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -27,8 +27,8 @@ def _cache_path(tickers: List[str], start: str, end: str) -> Path:
 
 	Returns
 	-------
-	Path
-		Path to the cache CSV under `data/`.
+    Path
+        Path to the cache CSV under `data/raw/`.
 	"""
 	slug = "_".join(sorted([t.replace("/", "-") for t in tickers]))
 	return DATA_DIR / f"adjclose_{slug}_{start}_{end}.csv"
@@ -68,10 +68,10 @@ def _clean_price_frame(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def get_price_data(tickers: List[str], start: str, end: str) -> pd.DataFrame:
-	"""Download daily Adjusted Close prices and cache to `data/`.
+    """Download daily Adjusted Close prices and cache to `data/raw/`.
 
-	This function fetches adjusted close prices for the provided tickers from
-	yfinance, caches them as a CSV in `data/`, and performs light cleaning to
+    This function fetches adjusted close prices for the provided tickers from
+    yfinance, caches them as a CSV in `data/raw/`, and performs light cleaning to
 	handle small gaps. If a cache file matching the request exists, it is loaded
 	to avoid repeated downloads.
 

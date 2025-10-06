@@ -14,7 +14,10 @@ A clean, modular, and production-ready pairs trading project suitable for a quan
 ## Project Structure
 ```
 pairs-trading/
-├─ data/                       # cached CSV price data
+├─ data/
+│  ├─ raw/                     # cached raw CSV price data
+│  ├─ processed/               # derived/intermediate datasets (ignored)
+│  └─ interim/                 # temporary artifacts (ignored)
 ├─ notebooks/
 │  ├─ 01_data_download.ipynb
 │  ├─ 02_cointegration_scan.ipynb
@@ -95,7 +98,7 @@ plt.tight_layout(); plt.show()
 ```
 
 ## Notes
-- Data is cached under `data/` by ticker basket and date range.
+- Data is cached under `data/raw/` by ticker basket and date range.
 - If some tickers fail to download, they are reported and omitted gracefully.
 - Transaction costs are assessed on position changes (per-leg bps).
 - All modules are PEP8-compliant and include type hints.

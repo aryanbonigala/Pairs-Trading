@@ -8,13 +8,118 @@
 
 ## Test Results Summary
 
-| Test ID | Description | Timeframe | Start Equity | Universe | Config(s) | Aggregate Results | Notes |
-|---|---|---|---:|---|---|---|---|
-| T1 | KO–PEP smoke test (single pair) | 2018-01-01 to 2025-01-01 | $100,000 per pair | KO–PEP | baseline: lookback=60, z_in=2.0, z_out=0.5, stop=3.5, cost_bps=2.0 | beta=2.7133; Total P&L=-$5,452.84; Final Eq=$94,547.16; metrics: ann_return=-3.43%, ann_vol=28.36%, Sharpe=-0.121, max_dd=-55.25% | Confirms pipeline; poor mean reversion (ADF p≈0.31), long half-life ~109 days |
-| T2 | Multi-pair baseline scan | 2018-01-01 to 2025-01-01 | $100,000 per pair | AAPL–MSFT, GOOGL–META, CSCO–JNPR, KO–PEP, PG–CL, F–GM, NKE–ADDYY, PM–MO, XOM–CVX, SLB–HAL | baseline (same as T1) | Positives: 5, Negatives: 4, Errors: 1 (JNPR data); Examples: AAPL–MSFT +$1,116.98; F–GM +$39,858.16; XOM–CVX +$21,210.69 | Majority positive; KO–PEP and PG–CL weak; JNPR unavailable |
-| T3 | Enhanced entries: take-profit + confirmation; multiple templates | 2018-01-01 to 2025-01-01 | $100,000 per pair | Same 10 pairs | baseline; slow (LB=90,z_in=2.5,z_out=0.5,stop=4.0, tp=0.1,confirm=0.1); slow_strict (LB=126,z_in=3.0,z_out=0.5,stop=4.0,tp=0.0,confirm=0.1); fast (LB=45,z_in=2.0,z_out=0.4,stop=3.5,tp=0.1,confirm=0.1) | Config summary: baseline avg PnL $6,967 (WR 66.7%); slow $8,931 (WR 66.7%); slow_strict $3,840 (WR 55.6%); fast $12,107 (WR 66.7%) | Fast performed best overall; slow/strict reduced losses on staples; KO–PEP improved under slow_strict |
-| T4 | Dynamic sizing + vol targeting (10% ann, cap 1.5) vs baseline/fast | 2018-01-01 to 2025-01-01 | $100,000 per pair | Same 10 pairs | dynamic: size ∝ min(|z|/z_in, 1.5), vol_target=10%, window=63; compare to baseline and fast from T3 | Aggregate: baseline avg $6,967 (WR 66.7%); fast avg $12,107 (WR 66.7%); dynamic avg $5,537 (WR 55.6%), median $486 | Dynamic reduced upside on strong pairs (e.g., NKE–ADDYY), modestly improved tails (e.g., SLB–HAL) |
-| T5 | Dynamic sizing + regime filters; higher vol target and cap by sector | 2018-01-01 to 2025-01-01 | $100,000 per pair | Same 10 pairs | dynamic_filtered: pair-specific vol_target (energy 15%, autos 14%, consumer 13%, tech/tobacco 12%, staples 10%), cap=2.0; fast for signal; regime filter: rolling 252d ADF p<0.1 and half-life in [10,75] | Aggregate PnL (per pair): baseline avg $6,967; fast avg $12,107; dynamic_filtered avg $1,452; median $1,191; WR 66.7% | Improved weak pairs (KO–PEP to small gain; PG–CL to ~breakeven), but underperformed fast on strong pairs (XOM–CVX, PM–MO) due to conservative filtering and vol caps |
+### T1 — KO–PEP smoke test (single pair)
+- **Timeframe**: 2018-01-01 to 2025-01-01
+- **Start Equity**: $100,000 per pair
+- **Universe**:
+  - KO–PEP
+- **Config (baseline)**:
+  - lookback: 60
+  - z_in: 2.0
+  - z_out: 0.5
+  - stop: 3.5
+  - cost_bps: 2.0
+- **Key Results**:
+  - beta: 2.7133
+  - Total P&L: -$5,452.84
+  - Final Equity: $94,547.16
+  - ann_return: -3.43%
+  - ann_vol: 28.36%
+  - Sharpe: -0.121
+  - max_dd: -55.25%
+- **Notes**: Poor mean reversion (ADF p≈0.31), half-life ~109 days.
+
+### T2 — Multi-pair baseline scan
+- **Timeframe**: 2018-01-01 to 2025-01-01
+- **Start Equity**: $100,000 per pair
+- **Universe**:
+  - AAPL–MSFT
+  - GOOGL–META
+  - CSCO–JNPR
+  - KO–PEP
+  - PG–CL
+  - F–GM
+  - NKE–ADDYY
+  - PM–MO
+  - XOM–CVX
+  - SLB–HAL
+- **Config (baseline)**:
+  - lookback: 60
+  - z_in: 2.0
+  - z_out: 0.5
+  - stop: 3.5
+  - cost_bps: 2.0
+- **Aggregate Results**:
+  - positives: 5
+  - negatives: 4
+  - errors: 1 (JNPR data)
+  - examples: AAPL–MSFT +$1,116.98; F–GM +$39,858.16; XOM–CVX +$21,210.69
+- **Notes**: Majority positive; KO–PEP and PG–CL weak; JNPR unavailable.
+
+### T3 — Enhanced entries: take-profit + confirmation; templates
+- **Timeframe**: 2018-01-01 to 2025-01-01
+- **Start Equity**: $100,000 per pair
+- **Universe**:
+  - same 10 pairs as T2
+- **Configs**:
+  - baseline
+  - slow:
+    - lookback: 90
+    - z_in: 2.5
+    - z_out: 0.5
+    - stop: 4.0
+    - tp: 0.1
+    - confirm: 0.1
+  - slow_strict:
+    - lookback: 126
+    - z_in: 3.0
+    - z_out: 0.5
+    - stop: 4.0
+    - tp: 0.0
+    - confirm: 0.1
+  - fast:
+    - lookback: 45
+    - z_in: 2.0
+    - z_out: 0.4
+    - stop: 3.5
+    - tp: 0.1
+    - confirm: 0.1
+- **Aggregate Results**:
+  - baseline avg P&L: $6,967 (WR 66.7%)
+  - slow avg P&L: $8,931 (WR 66.7%)
+  - slow_strict avg P&L: $3,840 (WR 55.6%)
+  - fast avg P&L: $12,107 (WR 66.7%)
+- **Notes**: Fast best overall; slow/strict reduced losses on staples; KO–PEP improved under slow_strict.
+
+### T4 — Dynamic sizing + vol targeting (10% ann, cap 1.5)
+- **Timeframe**: 2018-01-01 to 2025-01-01
+- **Start Equity**: $100,000 per pair
+- **Universe**:
+  - same 10 pairs as T2
+- **Config (dynamic)**:
+  - size rule: min(|z|/z_in, 1.5)
+  - vol_target: 10% (window 63)
+  - costs: cost_bps as baseline
+- **Aggregate Results**:
+  - baseline avg P&L: $6,967 (WR 66.7%)
+  - fast avg P&L: $12,107 (WR 66.7%)
+  - dynamic avg P&L: $5,537 (WR 55.6%), median $486
+- **Notes**: Reduced upside on strong pairs (e.g., NKE–ADDYY), modest tail improvement (e.g., SLB–HAL).
+
+### T5 — Dynamic sizing + regime filters; higher vol target/cap by sector
+- **Timeframe**: 2018-01-01 to 2025-01-01
+- **Start Equity**: $100,000 per pair
+- **Universe**:
+  - same 10 pairs as T2
+- **Config (dynamic_filtered)**:
+  - vol_target (ann): energy 15%, autos 14%, consumer 13%, tech 12%, tobacco 12%, staples 10%
+  - cap: 2.0
+  - signal template: fast
+  - regime filter: rolling 252d ADF p < 0.1 AND half-life ∈ [10, 75]
+- **Aggregate Results**:
+  - baseline avg P&L: $6,967; fast avg P&L: $12,107
+  - dynamic_filtered avg P&L: $1,452; median $1,191; WR 66.7%
+- **Notes**: Improved weak pairs (KO–PEP to small gain; PG–CL to ~breakeven), but underperformed fast on strong pairs (XOM–CVX, PM–MO) due to conservative filtering and caps.
 
 Notes:
 - All tests assume dollar-neutral positions, share-and-price-delta P&L with transaction costs applied on traded notional.
